@@ -9,7 +9,7 @@ import KarteView from '@/components/karte/KarteView.vue'
 import KundenDetail from '@/components/kunde/KundenDetail.vue'
 import KiPanel from '@/components/ki/KiPanel.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
-import type { KiEmpfehlungResult } from '@/types'
+import type { KiEmpfehlungResult, Kunde } from '@/types'
 
 const planung = usePlanungStore()
 const kundenStore = useKundenStore()
@@ -18,14 +18,14 @@ const ki = useKiStore()
 type MobileView = 'liste' | 'karte'
 const mobileView = ref<MobileView>('liste')
 
-const wochenKunden = computed(() =>
-  planung.besucheForWeek.value
-    .map((b) => kundenStore.getKundeById.value(b.kundeId))
-    .filter(Boolean)
-    .filter((k, i, arr) => arr.findIndex((x) => x?.id === k?.id) === i) as ReturnType<typeof kundenStore.getKundeById.value>[]
-)
+const wochenKunden = computed((): Kunde[] => {
+  const seen = new Set<string>()
+  return planung.besucheForWeek
+    .map((b) => kundenStore.getKundeById(b.kundeId))
+    .filter((k): k is Kunde => !!k && !seen.has(k.id) && seen.add(k.id) !== undefined)
+})
 
-const tagBesuche = computed(() => planung.besucheForTag.value(planung.selectedTag))
+const tagBesuche = computed(() => planung.besucheForTag(planung.selectedTag))
 
 const routePolyline = ref<[number, number][]>([])
 const showKiAusfallPanel = ref(false)
@@ -33,7 +33,7 @@ const kiAusfallErgebnisse = ref<KiEmpfehlungResult[]>([])
 const kiAusfallLoading = ref(false)
 
 async function onKiErsatz(_besuchId: string, kundeId: string) {
-  const ausgefallenerKunde = kundenStore.getKundeById.value(kundeId)
+  const ausgefallenerKunde = kundenStore.getKundeById(kundeId)
   if (!ausgefallenerKunde) return
   showKiAusfallPanel.value = true
   kiAusfallLoading.value = true
@@ -46,8 +46,8 @@ async function optimiereRoute() {
   const besuche = tagBesuche.value.filter((b) => b.status === 'geplant')
   if (besuche.length < 2) return
   const kunden = besuche
-    .map((b) => kundenStore.getKundeById.value(b.kundeId))
-    .filter(Boolean) as NonNullable<ReturnType<typeof kundenStore.getKundeById.value>>[]
+    .map((b) => kundenStore.getKundeById(b.kundeId))
+    .filter((k): k is Kunde => !!k)
 
   const orderedIds = await ki.optimiereRoute(besuche, kunden)
   planung.routeNeuAnordnen(planung.selectedTag, orderedIds)
@@ -55,8 +55,8 @@ async function optimiereRoute() {
   const orderedKunden = orderedIds
     .map((id) => besuche.find((b) => b.id === id))
     .filter(Boolean)
-    .map((b) => kundenStore.getKundeById.value(b!.kundeId))
-    .filter(Boolean) as NonNullable<ReturnType<typeof kundenStore.getKundeById.value>>[]
+    .map((b) => kundenStore.getKundeById(b!.kundeId))
+    .filter((k): k is Kunde => !!k)
 
   routePolyline.value = orderedKunden.map((k) => [k.lat, k.lng] as [number, number])
 }
@@ -86,10 +86,9 @@ const tagDatum = computed(() => planung.tagDatum(planung.selectedTag))
       <!-- Liste -->
       <div :class="[
         'flex flex-col overflow-hidden bg-gray-50',
-        'md:w-2/5 md:border-r md:block',
+        'md:w-2/5 md:border-r md:flex',
         mobileView === 'liste' ? 'flex-1' : 'hidden'
       ]">
-        <!-- KI Routenoptimierung Button -->
         <div class="px-3 pt-3">
           <button @click="optimiereRoute"
             :disabled="ki.isLoading && ki.currentTask === 'route'"
@@ -116,7 +115,7 @@ const tagDatum = computed(() => planung.tagDatum(planung.selectedTag))
         mobileView === 'karte' ? 'flex-1' : 'hidden'
       ]" style="height: 100%">
         <KarteView
-          :kunden="(wochenKunden.filter(Boolean) as any)"
+          :kunden="wochenKunden"
           :besuche="tagBesuche"
           :route-polyline="routePolyline"
           @kunde-click="planung.openKundenDetail"

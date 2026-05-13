@@ -8,7 +8,7 @@ import KundenDetail from '@/components/kunde/KundenDetail.vue'
 const kundenStore = useKundenStore()
 const planung = usePlanungStore()
 
-const alleBesuche = computed(() => planung.besucheForWeek.value)
+const alleBesuche = computed(() => planung.besucheForWeek)
 </script>
 
 <template>
