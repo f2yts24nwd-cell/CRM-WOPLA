@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import type { Kunde, Ansprechpartner, Aktivitaet, Opportunity, Angebot } from '@/types'
 import { mockKunden } from '@/data/mockKunden'
 import { mockAnsprechpartner } from '@/data/mockAnsprechpartner'
@@ -15,32 +15,31 @@ export const useKundenStore = defineStore('kunden', () => {
   const opportunities = ref<Opportunity[]>(mockOpportunities)
   const angebote = ref<Angebot[]>(mockAngebote)
 
-  const getKundeById = computed(() => (id: string) => kunden.value.find((k) => k.id === id))
+  function getKundeById(id: string): Kunde | undefined {
+    return kunden.value.find((k) => k.id === id)
+  }
 
-  const getAnsprechpartnerForKunde = computed(
-    () => (kundeId: string) => ansprechpartner.value.filter((a) => a.kundeId === kundeId)
-  )
+  function getAnsprechpartnerForKunde(kundeId: string): Ansprechpartner[] {
+    return ansprechpartner.value.filter((a) => a.kundeId === kundeId)
+  }
 
-  const getAktivitaetenForKunde = computed(
-    () => (kundeId: string) =>
-      aktivitaeten.value
-        .filter((a) => a.kundeId === kundeId)
-        .sort((a, b) => b.datum.getTime() - a.datum.getTime())
-  )
+  function getAktivitaetenForKunde(kundeId: string): Aktivitaet[] {
+    return aktivitaeten.value
+      .filter((a) => a.kundeId === kundeId)
+      .sort((a, b) => b.datum.getTime() - a.datum.getTime())
+  }
 
-  const getOpportunitiesForKunde = computed(
-    () => (kundeId: string) =>
-      opportunities.value
-        .filter((o) => o.kundeId === kundeId)
-        .sort((a, b) => b.abschlussDatum.getTime() - a.abschlussDatum.getTime())
-  )
+  function getOpportunitiesForKunde(kundeId: string): Opportunity[] {
+    return opportunities.value
+      .filter((o) => o.kundeId === kundeId)
+      .sort((a, b) => b.abschlussDatum.getTime() - a.abschlussDatum.getTime())
+  }
 
-  const getAngeboteForKunde = computed(
-    () => (kundeId: string) =>
-      angebote.value
-        .filter((a) => a.kundeId === kundeId)
-        .sort((a, b) => b.erstelltAm.getTime() - a.erstelltAm.getTime())
-  )
+  function getAngeboteForKunde(kundeId: string): Angebot[] {
+    return angebote.value
+      .filter((a) => a.kundeId === kundeId)
+      .sort((a, b) => b.erstelltAm.getTime() - a.erstelltAm.getTime())
+  }
 
   function kundenImUmkreis(lat: number, lng: number, radiusKm: number): Kunde[] {
     return kunden.value.filter((k) => haversine(lat, lng, k.lat, k.lng) <= radiusKm)

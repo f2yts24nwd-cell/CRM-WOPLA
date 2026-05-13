@@ -9,7 +9,7 @@ const tage = computed(() =>
   planung.WOCHENTAGE.map((tag, i) => ({
     tag,
     datum: addDays(planung.wocheStart, i),
-    anzahl: planung.besucheForTag.value(tag).length
+    anzahl: planung.besucheForTag(tag).length
   }))
 )
 

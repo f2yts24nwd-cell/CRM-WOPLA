@@ -14,10 +14,10 @@ const emit = defineEmits<{
 const planung = usePlanungStore()
 const kundenStore = useKundenStore()
 
-const besuche = computed(() => planung.besucheForTag.value(props.tag))
+const besuche = computed(() => planung.besucheForTag(props.tag))
 
 function getKunde(kundeId: string) {
-  return kundenStore.getKundeById.value(kundeId)
+  return kundenStore.getKundeById(kundeId)
 }
 
 function onAusgefallen(besuchId: string) {

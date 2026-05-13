@@ -38,7 +38,7 @@ onMounted(() => {
   if (props.vorausgewaehlteBesuchId) {
     const besuch = planung.besuche.find((b) => b.id === props.vorausgewaehlteBesuchId)
     if (besuch) {
-      const kunde = kundenStore.getKundeById.value(besuch.kundeId)
+      const kunde = kundenStore.getKundeById(besuch.kundeId)
       if (kunde) zentrum.value = [kunde.lat, kunde.lng]
     }
   }
