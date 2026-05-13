@@ -1,4 +1,7 @@
-export const d = (iso: string): Date => new Date(iso)
+export const d = (iso: string): Date => {
+  const [year, month, day] = iso.split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
 
 export function formatDate(date: Date): string {
   return date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
