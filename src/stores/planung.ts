@@ -18,21 +18,20 @@ export const usePlanungStore = defineStore('planung', () => {
     return addDays(wocheStart.value, idx)
   }
 
-  const besucheForTag = computed(() => (tag: Wochentag): Besuch[] => {
+  function besucheForTag(tag: Wochentag): Besuch[] {
     const datum = tagDatum(tag)
     return besuche.value
       .filter((b) => isSameDay(b.datum, datum))
       .sort((a, b) => a.startzeit.localeCompare(b.startzeit))
-  })
+  }
 
-  const besucheForWeek = computed((): Besuch[] => {
-    return besuche.value.filter((b) => {
-      const tag = b.datum
+  const besucheForWeek = computed((): Besuch[] =>
+    besuche.value.filter((b) => {
       const start = wocheStart.value
       const end = addDays(start, 4)
-      return tag >= start && tag <= end
+      return b.datum >= start && b.datum <= end
     })
-  })
+  )
 
   function vorigeWoche() {
     wocheStart.value = addDays(wocheStart.value, -7)
@@ -82,9 +81,7 @@ export const usePlanungStore = defineStore('planung', () => {
 
   function closeKundenDetail() {
     showKundenDetail.value = false
-    setTimeout(() => {
-      detailKundeId.value = null
-    }, 300)
+    setTimeout(() => { detailKundeId.value = null }, 300)
   }
 
   return {
