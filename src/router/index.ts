@@ -1,11 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import WochenPlanungView from '@/views/WochenPlanungView.vue'
 import KarteVollbildView from '@/views/KarteVollbildView.vue'
 import UmkreisSucheView from '@/views/UmkreisSucheView.vue'
 import KundenDetailView from '@/views/KundenDetailView.vue'
 
 export default createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', name: 'wochenplanung', component: WochenPlanungView },
     { path: '/karte', name: 'karte', component: KarteVollbildView },
