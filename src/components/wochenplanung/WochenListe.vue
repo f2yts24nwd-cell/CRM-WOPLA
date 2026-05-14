@@ -9,6 +9,7 @@ const props = defineProps<{ tag: Wochentag }>()
 const emit = defineEmits<{
   (e: 'ki-ersatz', besuchId: string, kundeId: string): void
   (e: 'detail-open', kundeId: string): void
+  (e: 'detail-schnell', besuchId: string): void
 }>()
 
 const planung = usePlanungStore()
@@ -42,6 +43,7 @@ function onKiErsatz(besuchId: string) {
         @ausgefallen="onAusgefallen"
         @ki-ersatz="onKiErsatz"
         @detail-open="emit('detail-open', $event)"
+        @detail-schnell="emit('detail-schnell', $event)"
       />
     </template>
     <div v-else class="flex flex-col items-center justify-center py-16 px-4 text-center">

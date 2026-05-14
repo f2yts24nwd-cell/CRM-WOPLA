@@ -6,6 +6,7 @@ import Badge from '@/components/ui/Badge.vue'
 import KundenDetail from '@/components/kunde/KundenDetail.vue'
 import TagsBriefing from '@/components/heute/TagsBriefing.vue'
 import BesuchsberichtDialog from '@/components/besuch/BesuchsberichtDialog.vue'
+import TerminSchnellansicht from '@/components/besuch/TerminSchnellansicht.vue'
 import { formatDate } from '@/utils/dates'
 import { daysSince } from '@/utils/geo'
 import type { Besuch } from '@/types'
@@ -14,6 +15,7 @@ const planung = usePlanungStore()
 const kundenStore = useKundenStore()
 
 const berichtBesuchId = ref<string | null>(null)
+const schnellansichtBesuchId = ref<string | null>(null)
 
 const besuche = computed(() => planung.heutigeBesuche)
 
@@ -146,7 +148,7 @@ function istNaechster(b: Besuch): boolean {
                 <!-- Detail-Button immer -->
                 <button
                   class="flex-1 py-2 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 bg-white active:bg-gray-50"
-                  @click="planung.openKundenDetail(besuch.kundeId)"
+                  @click="schnellansichtBesuchId = besuch.id"
                 >
                   Details
                 </button>
@@ -178,6 +180,14 @@ function istNaechster(b: Besuch): boolean {
         </div>
       </div>
     </div>
+
+    <!-- Termin-Schnellansicht -->
+    <TerminSchnellansicht
+      v-if="schnellansichtBesuchId"
+      :besuch-id="schnellansichtBesuchId"
+      @close="schnellansichtBesuchId = null"
+      @open-vollprofil="(kundeId) => { schnellansichtBesuchId = null; planung.openKundenDetail(kundeId) }"
+    />
 
     <!-- Besuchsbericht Dialog -->
     <BesuchsberichtDialog

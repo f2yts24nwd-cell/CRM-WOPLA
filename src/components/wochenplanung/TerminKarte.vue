@@ -13,6 +13,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'ausgefallen', besuchId: string): void
   (e: 'detail-open', kundeId: string): void
+  (e: 'detail-schnell', besuchId: string): void
   (e: 'ki-ersatz', besuchId: string): void
 }>()
 
@@ -75,7 +76,7 @@ function randFarbe(): string {
           </button>
           <button
             class="flex-1 py-2 rounded-lg text-xs font-semibold bg-primary-500 text-white active:bg-primary-700"
-            @click.stop="emit('detail-open', kunde.id)"
+            @click.stop="emit('detail-schnell', besuch.id)"
           >
             Details
           </button>

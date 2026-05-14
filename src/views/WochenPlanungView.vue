@@ -8,6 +8,7 @@ import WochenListe from '@/components/wochenplanung/WochenListe.vue'
 import KarteView from '@/components/karte/KarteView.vue'
 import KundenDetail from '@/components/kunde/KundenDetail.vue'
 import KiPanel from '@/components/ki/KiPanel.vue'
+import TerminSchnellansicht from '@/components/besuch/TerminSchnellansicht.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import type { KiEmpfehlungResult, Kunde } from '@/types'
 
@@ -31,6 +32,7 @@ const wochenKunden = computed((): Kunde[] => {
 const tagBesuche = computed(() => planung.besucheForTag(planung.selectedTag))
 
 const routePolyline = ref<[number, number][]>([])
+const schnellansichtBesuchId = ref<string | null>(null)
 const showKiAusfallPanel = ref(false)
 const kiAusfallErgebnisse = ref<KiEmpfehlungResult[]>([])
 const kiAusfallLoading = ref(false)
@@ -109,6 +111,7 @@ const tagDatum = computed(() => planung.tagDatum(planung.selectedTag))
           :tag="planung.selectedTag"
           @ki-ersatz="onKiErsatz"
           @detail-open="planung.openKundenDetail"
+          @detail-schnell="(id) => schnellansichtBesuchId = id"
         />
       </div>
 
@@ -126,6 +129,14 @@ const tagDatum = computed(() => planung.tagDatum(planung.selectedTag))
         />
       </div>
     </div>
+
+    <!-- Termin-Schnellansicht -->
+    <TerminSchnellansicht
+      v-if="schnellansichtBesuchId"
+      :besuch-id="schnellansichtBesuchId"
+      @close="schnellansichtBesuchId = null"
+      @open-vollprofil="(kundeId) => { schnellansichtBesuchId = null; planung.openKundenDetail(kundeId) }"
+    />
 
     <!-- KI Ausfallersatz Panel -->
     <KiPanel
