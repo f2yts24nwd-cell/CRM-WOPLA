@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Kunde, Besuch, Aktivitaet, Opportunity, KiEmpfehlungResult, KiGespraechResult } from '@/types'
+import type { Kunde, Besuch, Aktivitaet, Opportunity, KiEmpfehlungResult, KiGespraechResult, KiBesuchsBerichtResult, KiTagesBriefingResult, Folgeaktion } from '@/types'
 import { haversine, daysSince } from '@/utils/geo'
 
-type KiTask = 'empfehlung' | 'route' | 'gespraech' | 'ausfallersatz' | null
+type KiTask = 'empfehlung' | 'route' | 'gespraech' | 'ausfallersatz' | 'bericht' | 'briefing' | null
 
 const BEGRUENDUNGEN: Record<string, string[]> = {
   A: [
@@ -127,12 +127,83 @@ export const useKiStore = defineStore('ki', () => {
     return result
   }
 
+  async function verarbeiteBesuchsBericht(
+    transkript: string,
+    kunde: Kunde,
+    aktivitaeten: Aktivitaet[]
+  ): Promise<KiBesuchsBerichtResult> {
+    isLoading.value = true
+    currentTask.value = 'bericht'
+    const tage = daysSince(kunde.letzterBesuch)
+    const letzteAkt = aktivitaeten[0]
+    const positiv = transkript.length > 80 || transkript.toLowerCase().includes('gut') || transkript.toLowerCase().includes('positiv')
+    const kritisch = transkript.toLowerCase().includes('problem') || transkript.toLowerCase().includes('unzufrieden')
+    const stimmung: 'positiv' | 'neutral' | 'kritisch' = kritisch ? 'kritisch' : positiv ? 'positiv' : 'neutral'
+
+    const zusammenfassung = `Besuch bei ${kunde.name} (${kunde.abcStatus}-Kunde, ${kunde.branche}). ${stimmung === 'positiv' ? 'Gespräch verlief sehr positiv.' : stimmung === 'kritisch' ? 'Es wurden kritische Punkte angesprochen.' : 'Routinegespräch ohne besondere Vorkommnisse.'} ${letzteAkt ? `Seit dem letzten Kontakt (${letzteAkt.typ} vor ${tage} Tagen) gab es relevante Entwicklungen.` : ''}`
+
+    const heute = new Date()
+    const inTagen = (n: number): Date => {
+      const d = new Date(heute)
+      d.setDate(d.getDate() + n)
+      return d
+    }
+
+    const folgeaktionen: Omit<Folgeaktion, 'id' | 'besuchId' | 'kundeId' | 'erledigt'>[] = [
+      { typ: 'Email', beschreibung: `Besuchsprotokoll und Zusammenfassung an ${kunde.name} senden`, faelligAm: inTagen(2) },
+      { typ: 'Anruf', beschreibung: 'Offene Fragen telefonisch klären und Feedback einholen', faelligAm: inTagen(7) },
+      { typ: 'Besuch', beschreibung: `Folgetermin bei ${kunde.name} einplanen`, faelligAm: inTagen(30) }
+    ]
+
+    if (kunde.abcStatus === 'A' || stimmung === 'positiv') {
+      folgeaktionen.splice(2, 0, { typ: 'Angebot', beschreibung: 'Angebot für besprochene Lösung erstellen', faelligAm: inTagen(5) })
+    }
+
+    const result: KiBesuchsBerichtResult = { zusammenfassung, stimmung, folgeaktionen }
+    return await withDelay(result).finally(() => {
+      isLoading.value = false
+      currentTask.value = null
+    })
+  }
+
+  async function erstelleTagesBriefing(
+    besuche: Besuch[],
+    kunden: Kunde[]
+  ): Promise<KiTagesBriefingResult> {
+    isLoading.value = true
+    currentTask.value = 'briefing'
+    const geplant = besuche.filter((b) => b.status === 'geplant')
+    const prioritaetsKunde = kunden
+      .filter((k) => geplant.some((b) => b.kundeId === k.id))
+      .sort((a, b) => {
+        const scoreA = (a.abcStatus === 'A' ? 3 : a.abcStatus === 'B' ? 2 : 1) * 10 + daysSince(a.letzterBesuch) / 10
+        const scoreB = (b.abcStatus === 'A' ? 3 : b.abcStatus === 'B' ? 2 : 1) * 10 + daysSince(b.letzterBesuch) / 10
+        return scoreB - scoreA
+      })[0]
+
+    const result: KiTagesBriefingResult = {
+      prioritaet: prioritaetsKunde
+        ? `${prioritaetsKunde.name} (${prioritaetsKunde.abcStatus}-Kunde, ${daysSince(prioritaetsKunde.letzterBesuch)} Tage kein Besuch)`
+        : 'Alle Termine gleichwertig',
+      routeStatus: geplant.length >= 2 ? 'Route optimiert · ca. 45 min Fahrzeit gesamt' : 'Einzeltermin · keine Optimierung nötig',
+      hinweis: prioritaetsKunde && prioritaetsKunde.abcStatus === 'A'
+        ? `Bereiten Sie sich gut auf ${prioritaetsKunde.name} vor – hohe Abschlusschance!`
+        : 'Gute Vorbereitung ist der Schlüssel – viel Erfolg!'
+    }
+    return await withDelay(result, 1000).finally(() => {
+      isLoading.value = false
+      currentTask.value = null
+    })
+  }
+
   return {
     isLoading,
     currentTask,
     berechneEmpfehlungen,
     optimiereRoute,
     erstelleGespraechsvorbereitung,
-    schlageAusfallersatzVor
+    schlageAusfallersatzVor,
+    verarbeiteBesuchsBericht,
+    erstelleTagesBriefing
   }
 })

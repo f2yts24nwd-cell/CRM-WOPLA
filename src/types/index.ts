@@ -69,5 +69,35 @@ export interface KiGespraechResult {
   letzteAktivitaet: string
 }
 
+export interface BesuchsBericht {
+  besuchId: string
+  transkript: string
+  zusammenfassung: string
+  stimmung: 'positiv' | 'neutral' | 'kritisch'
+  erstelltAm: Date
+}
+
+export interface Folgeaktion {
+  id: string
+  besuchId: string
+  kundeId: string
+  typ: 'Anruf' | 'Email' | 'Besuch' | 'Angebot'
+  beschreibung: string
+  faelligAm: Date
+  erledigt: boolean
+}
+
+export interface KiBesuchsBerichtResult {
+  zusammenfassung: string
+  stimmung: 'positiv' | 'neutral' | 'kritisch'
+  folgeaktionen: Omit<Folgeaktion, 'id' | 'besuchId' | 'kundeId' | 'erledigt'>[]
+}
+
+export interface KiTagesBriefingResult {
+  prioritaet: string
+  routeStatus: string
+  hinweis: string
+}
+
 export type Wochentag = 'Mo' | 'Di' | 'Mi' | 'Do' | 'Fr'
 export type AbcStatus = 'A' | 'B' | 'C'
