@@ -97,6 +97,11 @@ export const usePlanungStore = defineStore('planung', () => {
     return berichte.value.find((b) => b.besuchId === besuchId)
   }
 
+  function folgeaktionErledigen(id: string) {
+    const f = folgeaktionen.value.find((f) => f.id === id)
+    if (f) f.erledigt = true
+  }
+
   function openKundenDetail(kundeId: string) {
     detailKundeId.value = kundeId
     showKundenDetail.value = true
@@ -128,6 +133,7 @@ export const usePlanungStore = defineStore('planung', () => {
     routeNeuAnordnen,
     openKundenDetail,
     closeKundenDetail,
+    folgeaktionErledigen,
     WOCHENTAGE
   }
 })

@@ -8,6 +8,7 @@ import WochenListe from '@/components/wochenplanung/WochenListe.vue'
 import KarteView from '@/components/karte/KarteView.vue'
 import KundenDetail from '@/components/kunde/KundenDetail.vue'
 import KiPanel from '@/components/ki/KiPanel.vue'
+import TerminSchnellansicht from '@/components/besuch/TerminSchnellansicht.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import type { KiEmpfehlungResult, Kunde } from '@/types'
 
@@ -18,6 +19,7 @@ const ki = useKiStore()
 type MobileView = 'liste' | 'karte'
 const mobileView = ref<MobileView>('liste')
 const karteRef = ref<InstanceType<typeof KarteView>>()
+const schnellansichtBesuchId = ref<string | null>(null)
 
 watch(mobileView, (v) => { if (v === 'karte') karteRef.value?.invalidateSize() })
 
@@ -68,19 +70,19 @@ const tagDatum = computed(() => planung.tagDatum(planung.selectedTag))
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-full bg-page">
     <TagsNavigator />
 
-    <!-- Mobile: Umschalter Liste/Karte -->
-    <div class="md:hidden flex border-b border-gray-200 bg-white">
+    <!-- Mobile: Umschalter Liste/Karte — Fiori Underline Tabs -->
+    <div class="md:hidden flex border-b border-border bg-surface">
       <button @click="mobileView = 'liste'"
-        :class="['flex-1 py-2.5 text-sm font-semibold transition-colors',
-          mobileView === 'liste' ? 'text-primary-500 border-b-2 border-primary-500' : 'text-gray-400']">
+        :class="['flex-1 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
+          mobileView === 'liste' ? 'text-brand border-brand' : 'text-text2 border-transparent']">
         Liste
       </button>
       <button @click="mobileView = 'karte'"
-        :class="['flex-1 py-2.5 text-sm font-semibold transition-colors',
-          mobileView === 'karte' ? 'text-primary-500 border-b-2 border-primary-500' : 'text-gray-400']">
+        :class="['flex-1 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
+          mobileView === 'karte' ? 'text-brand border-brand' : 'text-text2 border-transparent']">
         Karte
       </button>
     </div>
@@ -88,14 +90,14 @@ const tagDatum = computed(() => planung.tagDatum(planung.selectedTag))
     <div class="flex flex-1 overflow-hidden">
       <!-- Liste -->
       <div :class="[
-        'flex flex-col overflow-hidden bg-gray-50',
-        'md:w-2/5 md:border-r md:flex',
+        'flex flex-col overflow-hidden bg-page',
+        'md:w-2/5 md:border-r md:border-border md:flex',
         mobileView === 'liste' ? 'flex-1' : 'hidden'
       ]">
         <div class="px-3 pt-3">
           <button @click="optimiereRoute"
             :disabled="ki.isLoading && ki.currentTask === 'route'"
-            class="w-full py-2.5 bg-white border border-primary-200 text-primary-600 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 shadow-sm hover:bg-primary-50 active:bg-primary-100 transition-colors disabled:opacity-50">
+            class="w-full py-2.5 bg-surface border border-border text-brand text-sm font-semibold rounded flex items-center justify-center gap-2 hover:bg-surface2 active:bg-surface2 transition-colors disabled:opacity-50">
             <LoadingSpinner v-if="ki.isLoading && ki.currentTask === 'route'" size="sm" />
             <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -109,6 +111,7 @@ const tagDatum = computed(() => planung.tagDatum(planung.selectedTag))
           :tag="planung.selectedTag"
           @ki-ersatz="onKiErsatz"
           @detail-open="planung.openKundenDetail"
+          @detail-schnell="(id) => schnellansichtBesuchId = id"
         />
       </div>
 
@@ -126,6 +129,14 @@ const tagDatum = computed(() => planung.tagDatum(planung.selectedTag))
         />
       </div>
     </div>
+
+    <!-- Termin-Schnellansicht -->
+    <TerminSchnellansicht
+      v-if="schnellansichtBesuchId"
+      :besuch-id="schnellansichtBesuchId"
+      @close="schnellansichtBesuchId = null"
+      @open-vollprofil="(kundeId) => { schnellansichtBesuchId = null; planung.openKundenDetail(kundeId) }"
+    />
 
     <!-- KI Ausfallersatz Panel -->
     <KiPanel
