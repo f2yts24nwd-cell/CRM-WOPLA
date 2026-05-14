@@ -49,14 +49,20 @@
   html {
     -webkit-tap-highlight-color: transparent;
     color-scheme: light;
+    overflow-x: hidden;
   }
-  .dark html {
+  html.dark {
     color-scheme: dark;
   }
   body {
     background: rgb(var(--c-page));
     color: rgb(var(--c-text));
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+  #app {
+    overflow-x: hidden;
+    position: relative;
   }
 }
 
@@ -103,6 +109,7 @@
 .slide-right-enter-active,
 .slide-right-leave-active {
   transition: transform 0.3s ease;
+  overflow: hidden;
 }
 .slide-right-enter-from,
 .slide-right-leave-to {
