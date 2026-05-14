@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, shallowRef } from 'vue'
+import { computed, shallowRef, onMounted, nextTick } from 'vue'
 import { LMap, LTileLayer, LPolyline } from '@vue-leaflet/vue-leaflet'
 import type { Kunde, Besuch } from '@/types'
 import KundenPin from './KundenPin.vue'
@@ -18,7 +18,7 @@ const props = defineProps<{
 const emit = defineEmits<{ (e: 'kunde-click', kundeId: string): void }>()
 
 const mapRef = shallowRef()
-const mapCenter = computed((): [number, number] => props.center ?? [48.1374, 11.5754])
+const mapCenter = computed((): [number, number] => props.center ?? [48.892, 8.710])
 
 function istGeplant(kundeId: string): boolean {
   return (props.besuche ?? []).some(
@@ -31,6 +31,18 @@ function istAusgefallen(kundeId: string): boolean {
     (b) => b.kundeId === kundeId && b.status === 'ausgefallen'
   )
 }
+
+function invalidateSize() {
+  nextTick(() => {
+    setTimeout(() => {
+      mapRef.value?.leafletObject?.invalidateSize()
+    }, 50)
+  })
+}
+
+onMounted(invalidateSize)
+
+defineExpose({ invalidateSize })
 </script>
 
 <template>
@@ -39,7 +51,7 @@ function istAusgefallen(kundeId: string): boolean {
     :zoom="zoom ?? 11"
     :center="mapCenter"
     :use-global-leaflet="false"
-    class="w-full h-full"
+    style="width: 100%; height: 100%"
   >
     <LTileLayer
       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
