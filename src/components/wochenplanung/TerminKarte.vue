@@ -18,98 +18,101 @@ const emit = defineEmits<{
 
 const showConfirm = ref(false)
 
-function onAusgefallenClick() {
-  if (props.besuch.status !== 'ausgefallen') {
-    showConfirm.value = true
-  }
-}
-
 function bestaetigenAusgefallen() {
   showConfirm.value = false
   emit('ausgefallen', props.besuch.id)
   emit('ki-ersatz', props.besuch.id)
 }
+
+function randFarbe(): string {
+  if (props.besuch.status === 'abgeschlossen') return 'bg-green-500'
+  if (props.besuch.status === 'ausgefallen') return 'bg-red-400'
+  return 'bg-primary-500'
+}
 </script>
 
 <template>
-  <div
-    :class="[
-      'bg-white rounded-xl shadow-sm border mx-3 my-2 overflow-hidden transition-all',
-      besuch.status === 'ausgefallen' ? 'border-red-200 opacity-75' : 'border-gray-100',
-      besuch.status === 'abgeschlossen' ? 'border-green-200' : ''
-    ]"
-  >
-    <!-- Hauptinhalt -->
-    <button
-      class="w-full text-left p-3"
-      @click="emit('detail-open', kunde.id)"
-    >
-      <div class="flex items-start justify-between gap-2">
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <Badge :label="kunde.abcStatus" :variant="kunde.abcStatus" />
-            <span v-if="rank" class="text-xs text-gray-400 font-medium">Termin {{ rank }}</span>
+  <div :class="[
+    'bg-white rounded-xl shadow-sm border mx-3 my-2 overflow-hidden',
+    besuch.status === 'ausgefallen' ? 'border-red-100 opacity-80' : 'border-gray-100',
+    besuch.status === 'abgeschlossen' ? 'border-green-100' : ''
+  ]">
+    <div class="flex">
+      <!-- Farbiger Status-Rand -->
+      <div :class="['w-1 shrink-0', randFarbe()]" />
+
+      <div class="flex-1 min-w-0">
+        <!-- Klickbarer Hauptbereich -->
+        <button class="w-full text-left px-3 pt-3 pb-2" @click="emit('detail-open', kunde.id)">
+          <!-- Zeile 1: Uhrzeit + ABC + Tage -->
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-sm font-bold text-gray-800 tabular-nums">
+              {{ besuch.startzeit }} – {{ besuch.endzeit }}
+            </span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs text-gray-400">{{ daysSince(kunde.letzterBesuch) }} Tage</span>
+              <Badge :label="kunde.abcStatus" :variant="kunde.abcStatus" />
+            </div>
           </div>
+
+          <!-- Zeile 2: Kundenname -->
           <p class="font-semibold text-gray-900 text-sm leading-tight truncate">{{ kunde.name }}</p>
-          <p class="text-xs text-gray-500 mt-0.5 truncate">{{ kunde.adresse }}</p>
-          <p class="text-xs text-gray-400 mt-1">
-            Letzter Besuch: {{ daysSince(kunde.letzterBesuch) }} Tage
+          <p class="text-xs text-gray-400 mt-0.5 truncate">{{ kunde.adresse }}</p>
+
+          <p v-if="besuch.notiz" class="text-xs text-gray-500 mt-1.5 italic truncate">
+            {{ besuch.notiz }}
           </p>
-        </div>
-        <div class="flex flex-col items-end shrink-0">
-          <span class="text-sm font-semibold text-primary-600">{{ besuch.startzeit }}</span>
-          <span class="text-xs text-gray-400">{{ besuch.endzeit }}</span>
-          <Badge
-            v-if="besuch.status !== 'geplant'"
-            :label="besuch.status === 'abgeschlossen' ? 'Erledigt' : 'Ausgefallen'"
-            :variant="besuch.status"
-            class="mt-1"
-          />
-        </div>
-      </div>
+        </button>
 
-      <p v-if="besuch.notiz" class="text-xs text-gray-500 mt-2 italic truncate">
-        {{ besuch.notiz }}
-      </p>
-    </button>
-
-    <!-- Aktionen -->
-    <div v-if="besuch.status === 'geplant'" class="border-t border-gray-100">
-      <button
-        v-if="!showConfirm"
-        @click.stop="onAusgefallenClick"
-        class="w-full py-3 text-sm font-medium text-red-500 hover:bg-red-50 active:bg-red-100 transition-colors flex items-center justify-center gap-1"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-        Termin ausgefallen
-      </button>
-      <div v-else class="px-3 py-2 bg-red-50">
-        <p class="text-xs text-red-700 font-medium mb-2">Termin wirklich als ausgefallen markieren?</p>
-        <div class="flex gap-2">
-          <button @click.stop="bestaetigenAusgefallen"
-            class="flex-1 py-2 bg-red-500 text-white text-sm font-medium rounded-lg">
-            Ja, ausgefallen
+        <!-- Aktionen für geplante Termine -->
+        <div v-if="besuch.status === 'geplant' && !showConfirm"
+          class="flex gap-2 px-3 pb-3">
+          <button
+            class="flex-1 py-2 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 bg-white active:bg-gray-50"
+            @click.stop="showConfirm = true"
+          >
+            Ausgefallen
           </button>
-          <button @click.stop="showConfirm = false"
-            class="flex-1 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg">
-            Abbrechen
+          <button
+            class="flex-1 py-2 rounded-lg text-xs font-semibold bg-primary-500 text-white active:bg-primary-700"
+            @click.stop="emit('detail-open', kunde.id)"
+          >
+            Details
           </button>
         </div>
-      </div>
-    </div>
 
-    <!-- KI-Ersatz anzeigen, wenn ausgefallen -->
-    <div v-if="besuch.status === 'ausgefallen'" class="border-t border-red-100">
-      <button @click.stop="emit('ki-ersatz', besuch.id)"
-        class="w-full py-3 text-sm font-medium text-primary-500 hover:bg-primary-50 flex items-center justify-center gap-1">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-        </svg>
-        KI-Ersatz vorschlagen
-      </button>
+        <!-- Bestätigungsdialog -->
+        <div v-if="showConfirm" class="mx-3 mb-3 bg-red-50 rounded-xl p-3">
+          <p class="text-xs text-red-700 font-semibold mb-2">Termin als ausgefallen markieren?</p>
+          <div class="flex gap-2">
+            <button @click.stop="bestaetigenAusgefallen"
+              class="flex-1 py-2 bg-red-500 text-white text-xs font-semibold rounded-lg">
+              Ja, ausgefallen
+            </button>
+            <button @click.stop="showConfirm = false"
+              class="flex-1 py-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg">
+              Abbrechen
+            </button>
+          </div>
+        </div>
+
+        <!-- Ausgefallen: KI-Ersatz -->
+        <div v-if="besuch.status === 'ausgefallen'" class="px-3 pb-3">
+          <button @click.stop="emit('ki-ersatz', besuch.id)"
+            class="w-full py-2 rounded-lg text-xs font-semibold bg-primary-50 border border-primary-200 text-primary-600 active:bg-primary-100 flex items-center justify-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+            KI-Ersatz vorschlagen
+          </button>
+        </div>
+
+        <!-- Abgeschlossen: keine weitere Aktion -->
+        <div v-if="besuch.status === 'abgeschlossen'" class="px-3 pb-3">
+          <p class="text-xs text-green-600 font-semibold">✓ Besuch abgeschlossen</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>

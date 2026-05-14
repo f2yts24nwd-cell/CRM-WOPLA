@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Besuch, Wochentag } from '@/types'
+import type { Besuch, Wochentag, BesuchsBericht, Folgeaktion } from '@/types'
 import { mockBesuche } from '@/data/mockBesuche'
 import { getMonday, addDays, isSameDay } from '@/utils/dates'
 
@@ -12,6 +12,8 @@ export const usePlanungStore = defineStore('planung', () => {
   const selectedTag = ref<Wochentag>('Mo')
   const detailKundeId = ref<string | null>(null)
   const showKundenDetail = ref(false)
+  const berichte = ref<BesuchsBericht[]>([])
+  const folgeaktionen = ref<Folgeaktion[]>([])
 
   function tagDatum(tag: Wochentag): Date {
     const idx = WOCHENTAGE.indexOf(tag)
@@ -74,6 +76,27 @@ export const usePlanungStore = defineStore('planung', () => {
     })
   }
 
+  const heutigeBesuche = computed((): Besuch[] =>
+    besuche.value
+      .filter((b) => isSameDay(b.datum, new Date()))
+      .sort((a, b) => a.startzeit.localeCompare(b.startzeit))
+  )
+
+  function besuchAbschliessen(
+    id: string,
+    bericht: BesuchsBericht,
+    aktionen: Folgeaktion[]
+  ) {
+    const b = besuche.value.find((b) => b.id === id)
+    if (b) b.status = 'abgeschlossen'
+    berichte.value.push(bericht)
+    folgeaktionen.value.push(...aktionen)
+  }
+
+  function getBerichtForBesuch(besuchId: string): BesuchsBericht | undefined {
+    return berichte.value.find((b) => b.besuchId === besuchId)
+  }
+
   function openKundenDetail(kundeId: string) {
     detailKundeId.value = kundeId
     showKundenDetail.value = true
@@ -90,13 +113,18 @@ export const usePlanungStore = defineStore('planung', () => {
     selectedTag,
     detailKundeId,
     showKundenDetail,
+    berichte,
+    folgeaktionen,
+    heutigeBesuche,
     tagDatum,
     besucheForTag,
     besucheForWeek,
     vorigeWoche,
     naechsteWoche,
     besuchAlsAusgefallen,
+    besuchAbschliessen,
     besuchHinzufuegen,
+    getBerichtForBesuch,
     routeNeuAnordnen,
     openKundenDetail,
     closeKundenDetail,
