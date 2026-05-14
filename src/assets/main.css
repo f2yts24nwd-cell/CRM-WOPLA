@@ -2,12 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Fiori Horizon Color Tokens ─────────────────────────────────────────────
+   RGB-Triplets (ohne #) damit Tailwind Opacity-Modifier funktionieren:
+   bg-brand/10, text-positive/80 etc.
+   ────────────────────────────────────────────────────────────────────────── */
+:root {
+  --c-shell:        53 74 94;     /* #354a5e — Shell Bar */
+  --c-page:         245 246 247;  /* #f5f6f7 — Seitenhintergrund */
+  --c-surface:      255 255 255;  /* #ffffff — Karten/Panels */
+  --c-surface-2:    245 246 247;  /* Gruppenheader, sekundäre Flächen */
+  --c-input:        255 255 255;  /* Eingabefelder */
+  --c-brand:        0 112 242;    /* #0070f2 — SAP Blue */
+  --c-brand-active: 0 100 217;    /* #0064d9 — Emphasized Buttons */
+  --c-text:         50 54 58;     /* #32363a */
+  --c-text-2:       106 109 112;  /* #6a6d70 — Labels/Sekundär */
+  --c-border:       229 229 229;  /* #e5e5e5 */
+  --c-border-s:     201 203 205;  /* #c9cbcd — Strong border */
+  --c-positive:     24 137 24;    /* #188918 */
+  --c-negative:     176 0 0;      /* #b00000 */
+  --c-critical:     231 101 0;    /* #e76500 */
+  --c-info:         0 112 242;    /* = brand */
+  --c-neutral:      106 109 112;
+}
+
+/* ── Fiori Horizon Evening (Dark Mode) ──────────────────────────────────── */
+.dark {
+  --c-shell:        29 45 62;     /* #1d2d3e */
+  --c-page:         18 23 28;     /* #12171c */
+  --c-surface:      28 34 40;     /* #1c2228 */
+  --c-surface-2:    29 45 62;     /* #1d2d3e */
+  --c-input:        33 41 48;     /* #212930 */
+  --c-brand:        145 200 246;  /* #91c8f6 — helles Blau im Dunkel */
+  --c-brand-active: 0 112 242;    /* bleibt für Emphasized Buttons */
+  --c-text:         245 246 247;  /* #f5f6f7 */
+  --c-text-2:       134 150 169;  /* #8696a9 */
+  --c-border:       53 74 94;     /* #354a5e */
+  --c-border-s:     77 96 112;    /* #4d6070 */
+  --c-positive:     171 234 142;  /* #abea8e */
+  --c-negative:     255 136 136;  /* #ff8888 */
+  --c-critical:     245 166 35;   /* #f5a623 */
+  --c-info:         145 200 246;
+  --c-neutral:      134 150 169;
+}
+
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
+    color-scheme: light;
+  }
+  .dark html {
+    color-scheme: dark;
   }
   body {
-    @apply bg-gray-50 text-gray-900;
+    background: rgb(var(--c-page));
+    color: rgb(var(--c-text));
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
@@ -18,6 +66,10 @@
   }
   .pt-safe {
     padding-top: env(safe-area-inset-top);
+  }
+  /* Ring-offset passend zur Kartenoberfläche (für "Als nächstes" Highlight) */
+  .ring-offset-surface {
+    --tw-ring-offset-color: rgb(var(--c-surface));
   }
 }
 
@@ -32,6 +84,10 @@
 .leaflet-control-zoom a {
   border-radius: 8px !important;
   font-size: 16px !important;
+}
+/* Leaflet Dark Mode: gedämpfte Tiles */
+.dark .leaflet-tile-pane {
+  filter: brightness(0.75) saturate(0.85);
 }
 
 /* Slide transitions */

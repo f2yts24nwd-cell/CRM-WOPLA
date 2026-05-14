@@ -21,7 +21,6 @@ const ki = useKiStore()
 
 const karteRef = ref<InstanceType<typeof KarteView>>()
 
-// Zentrum: Mittelpunkt Pforzheim oder ausgefallener Kunde
 const zentrum = ref<[number, number]>([48.892, 8.710])
 
 const radius = ref(25)
@@ -85,17 +84,17 @@ const umkreis = computed(() => ({
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
-    <!-- Mobile Tabs -->
-    <div class="md:hidden flex border-b border-gray-200 bg-white">
+  <div class="flex flex-col h-full bg-page">
+    <!-- Mobile Tabs — Fiori Underline -->
+    <div class="md:hidden flex border-b border-border bg-surface">
       <button @click="mobileView = 'filter'"
-        :class="['flex-1 py-2.5 text-sm font-semibold transition-colors',
-          mobileView === 'filter' ? 'text-primary-500 border-b-2 border-primary-500' : 'text-gray-400']">
+        :class="['flex-1 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
+          mobileView === 'filter' ? 'text-brand border-brand' : 'text-text2 border-transparent']">
         Filter & Ergebnisse
       </button>
       <button @click="mobileView = 'karte'"
-        :class="['flex-1 py-2.5 text-sm font-semibold transition-colors',
-          mobileView === 'karte' ? 'text-primary-500 border-b-2 border-primary-500' : 'text-gray-400']">
+        :class="['flex-1 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px',
+          mobileView === 'karte' ? 'text-brand border-brand' : 'text-text2 border-transparent']">
         Karte
       </button>
     </div>
@@ -103,35 +102,35 @@ const umkreis = computed(() => ({
     <div class="flex flex-1 overflow-hidden">
       <!-- Filter + Ergebnisliste -->
       <div :class="[
-        'flex flex-col overflow-hidden bg-gray-50',
-        'md:w-2/5 md:border-r md:flex',
+        'flex flex-col overflow-hidden bg-page',
+        'md:w-2/5 md:border-r md:border-border md:flex',
         mobileView === 'filter' ? 'flex-1' : 'hidden'
       ]">
         <!-- Filter Panel -->
-        <div class="bg-white border-b border-gray-200 p-4 space-y-4">
+        <div class="bg-surface border-b border-border p-4 space-y-4">
           <!-- Radius -->
           <div>
             <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-semibold text-gray-700">Umkreis</span>
-              <span class="text-sm font-bold text-primary-500">{{ radius }} km</span>
+              <span class="text-sm font-semibold text-text1">Umkreis</span>
+              <span class="text-sm font-bold text-brand">{{ radius }} km</span>
             </div>
             <input type="range" min="5" max="100" step="5" v-model.number="radius"
-              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-500" />
+              class="w-full h-2 bg-surface2 rounded appearance-none cursor-pointer accent-brand" />
           </div>
 
           <!-- ABC-Filter -->
           <div>
-            <p class="text-sm font-semibold text-gray-700 mb-2">ABC-Status</p>
+            <p class="text-sm font-semibold text-text1 mb-2">ABC-Status</p>
             <div class="flex gap-2">
               <button v-for="s in ['A', 'B', 'C'] as AbcStatus[]" :key="s"
                 @click="toggleAbc(s)"
                 :class="[
-                  'flex-1 py-2 rounded-xl text-sm font-bold border-2 transition-colors',
+                  'flex-1 py-2 rounded text-sm font-bold border-2 transition-colors',
                   selectedAbc.includes(s)
-                    ? s === 'A' ? 'bg-primary-500 border-primary-500 text-white'
-                    : s === 'B' ? 'bg-teal-500 border-teal-500 text-white'
-                    : 'bg-gray-600 border-gray-600 text-white'
-                    : 'bg-white border-gray-200 text-gray-400'
+                    ? s === 'A' ? 'bg-info border-info text-white'
+                    : s === 'B' ? 'bg-positive border-positive text-white'
+                    : 'bg-neutral border-neutral text-white'
+                    : 'bg-surface border-border text-text2'
                 ]">
                 {{ s }}
               </button>
@@ -140,12 +139,12 @@ const umkreis = computed(() => ({
 
           <!-- Letzter Besuch -->
           <div>
-            <p class="text-sm font-semibold text-gray-700 mb-2">Letzter Besuch</p>
+            <p class="text-sm font-semibold text-text1 mb-2">Letzter Besuch</p>
             <div class="grid grid-cols-2 gap-2">
               <button v-for="opt in [{ label: 'Alle', val: 0 }, { label: '> 30 Tage', val: 30 }, { label: '> 60 Tage', val: 60 }, { label: '> 90 Tage', val: 90 }]"
                 :key="opt.val" @click="minTage = opt.val"
-                :class="['py-2 rounded-xl text-xs font-semibold border transition-colors',
-                  minTage === opt.val ? 'bg-primary-500 border-primary-500 text-white' : 'bg-white border-gray-200 text-gray-600']">
+                :class="['py-2 rounded text-xs font-semibold border transition-colors',
+                  minTage === opt.val ? 'bg-brand-active border-brand-active text-white' : 'bg-surface border-border text-text2']">
                 {{ opt.label }}
               </button>
             </div>
@@ -153,12 +152,12 @@ const umkreis = computed(() => ({
 
           <!-- Sortierung -->
           <div>
-            <p class="text-sm font-semibold text-gray-700 mb-2">Sortierung</p>
+            <p class="text-sm font-semibold text-text1 mb-2">Sortierung</p>
             <div class="flex gap-2">
               <button v-for="opt in [{ key: 'umsatz', label: 'Potenzial' }, { key: 'letzterBesuch', label: 'Ältester' }, { key: 'name', label: 'Name' }] as {key: SortKey, label: string}[]"
                 :key="opt.key" @click="sortKey = opt.key"
-                :class="['flex-1 py-2 rounded-xl text-xs font-semibold border transition-colors',
-                  sortKey === opt.key ? 'bg-teal-500 border-teal-500 text-white' : 'bg-white border-gray-200 text-gray-600']">
+                :class="['flex-1 py-2 rounded text-xs font-semibold border transition-colors',
+                  sortKey === opt.key ? 'bg-brand-active border-brand-active text-white' : 'bg-surface border-border text-text2']">
                 {{ opt.label }}
               </button>
             </div>
@@ -166,7 +165,7 @@ const umkreis = computed(() => ({
 
           <!-- KI Button -->
           <button @click="kiEmpfehlung" :disabled="ki.isLoading || gefilterteKunden.length === 0"
-            class="w-full py-3 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50">
+            class="w-full py-3 bg-brand-active active:bg-brand text-white font-semibold rounded flex items-center justify-center gap-2 disabled:opacity-50">
             <LoadingSpinner v-if="ki.isLoading && ki.currentTask === 'empfehlung'" size="sm" />
             <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -178,25 +177,25 @@ const umkreis = computed(() => ({
 
         <!-- Ergebnisliste -->
         <div class="flex-1 overflow-y-auto py-2">
-          <div v-if="gefilterteKunden.length === 0" class="text-center py-12 text-gray-400">
+          <div v-if="gefilterteKunden.length === 0" class="text-center py-12 text-text2">
             <p class="font-medium">Keine Kunden gefunden</p>
             <p class="text-sm mt-1">Filter anpassen oder Umkreis vergrößern</p>
           </div>
           <div v-for="kunde in gefilterteKunden" :key="kunde.id"
-            class="bg-white rounded-xl border border-gray-100 shadow-sm mx-3 my-2 p-3 cursor-pointer hover:border-primary-200 active:bg-gray-50"
+            class="bg-surface rounded-lg border border-border mx-3 my-2 p-3 cursor-pointer active:bg-surface2"
             @click="planung.openKundenDetail(kunde.id)">
             <div class="flex items-start justify-between mb-1">
               <div class="flex items-center gap-2">
                 <Badge :label="kunde.abcStatus" :variant="kunde.abcStatus" />
-                <span class="text-xs text-gray-400">{{ daysSince(kunde.letzterBesuch) }} Tage</span>
+                <span class="text-xs text-text2">{{ daysSince(kunde.letzterBesuch) }} Tage</span>
               </div>
-              <span class="text-sm font-bold text-gray-900">
+              <span class="text-sm font-bold text-text1">
                 {{ (kunde.umsatzPotenzial / 1000).toFixed(0) }} T€
               </span>
             </div>
-            <p class="font-semibold text-gray-900 text-sm">{{ kunde.name }}</p>
-            <p class="text-xs text-gray-500 mt-0.5">{{ kunde.adresse }}</p>
-            <p class="text-xs text-gray-400 mt-1">Letzter Besuch: {{ formatDate(kunde.letzterBesuch) }}</p>
+            <p class="font-semibold text-text1 text-sm">{{ kunde.name }}</p>
+            <p class="text-xs text-text2 mt-0.5">{{ kunde.adresse }}</p>
+            <p class="text-xs text-text2 mt-1">Letzter Besuch: {{ formatDate(kunde.letzterBesuch) }}</p>
           </div>
         </div>
       </div>

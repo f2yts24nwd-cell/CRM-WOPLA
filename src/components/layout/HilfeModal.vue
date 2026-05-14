@@ -22,7 +22,7 @@ const themen: Thema[] = [
     titel: 'Besuchsbericht & KI',
     icon: '🎙️',
     schritte: [
-      { icon: '🎙️', text: 'Tippe auf den großen orangenen Mikrofon-Button und sprich deinen Bericht ein.' },
+      { icon: '🎙️', text: 'Tippe auf den großen Mikrofon-Button und sprich deinen Bericht ein.' },
       { icon: '⏹️', text: 'Tippe erneut auf den Button, um die Aufnahme zu stoppen.' },
       { icon: '✍️', text: 'Alternativ kannst du den Bericht auch direkt in das Textfeld eintippen.' },
       { icon: '🤖', text: 'Tippe auf "KI analysieren lassen" – die KI erstellt Zusammenfassung und Folgeaktionen.' },
@@ -71,14 +71,14 @@ const themen: Thema[] = [
 <template>
   <Teleport to="body">
     <div class="fixed inset-0 z-50 flex flex-col justify-end bg-black/40" @click.self="emit('close')">
-      <div class="bg-white rounded-t-2xl flex flex-col max-h-[90dvh]">
+      <div class="bg-surface rounded-t-xl flex flex-col max-h-[90dvh]">
         <!-- Handle + Header -->
-        <div class="flex-shrink-0 pt-3 pb-2 px-4 border-b border-gray-100">
-          <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-3" />
+        <div class="flex-shrink-0 pt-3 pb-2 px-4 border-b border-border">
+          <div class="w-10 h-1 bg-border rounded-full mx-auto mb-3" />
           <div class="flex items-center justify-between">
-            <h2 class="font-bold text-gray-900 text-base">Hilfe & Anleitung</h2>
+            <h2 class="font-bold text-text1 text-base">Hilfe & Anleitung</h2>
             <button @click="emit('close')"
-              class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 text-gray-500">
+              class="w-8 h-8 flex items-center justify-center rounded bg-surface2 text-text2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
@@ -89,26 +89,26 @@ const themen: Thema[] = [
         <!-- Scrollbarer Inhalt -->
         <div class="flex-1 overflow-y-auto px-4 py-3 space-y-3">
           <div v-for="thema in themen" :key="thema.id"
-            class="bg-gray-50 rounded-2xl overflow-hidden">
+            class="bg-surface2 rounded-lg overflow-hidden border border-border">
             <!-- Thema-Header -->
-            <div class="flex items-center gap-3 px-4 py-3 bg-primary-50 border-b border-primary-100">
+            <div class="flex items-center gap-3 px-4 py-3 bg-brand/5 border-b border-brand/20">
               <span class="text-xl">{{ thema.icon }}</span>
-              <h3 class="font-bold text-primary-700 text-sm">{{ thema.titel }}</h3>
+              <h3 class="font-bold text-brand text-sm">{{ thema.titel }}</h3>
             </div>
             <!-- Schritte -->
             <div class="px-4 py-3 space-y-2.5">
               <div v-for="(schritt, i) in thema.schritte" :key="i"
                 class="flex items-start gap-3">
-                <div class="w-5 h-5 rounded-full bg-primary-100 text-primary-600 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                <div class="w-5 h-5 rounded-full bg-brand/10 text-brand text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
                   {{ i + 1 }}
                 </div>
-                <p class="text-sm text-gray-700 leading-snug">{{ schritt.text }}</p>
+                <p class="text-sm text-text1 leading-snug">{{ schritt.text }}</p>
               </div>
             </div>
           </div>
 
           <!-- Footer -->
-          <p class="text-center text-xs text-gray-400 pb-2">
+          <p class="text-center text-xs text-text2 pb-2">
             WOPLA · Außendienst-Planungstool
           </p>
         </div>
