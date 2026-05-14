@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { usePlanungStore } from '@/stores/planung'
 import { useKundenStore } from '@/stores/kunden'
 import { useKiStore } from '@/stores/ki'
@@ -17,6 +17,9 @@ const ki = useKiStore()
 
 type MobileView = 'liste' | 'karte'
 const mobileView = ref<MobileView>('liste')
+const karteRef = ref<InstanceType<typeof KarteView>>()
+
+watch(mobileView, (v) => { if (v === 'karte') karteRef.value?.invalidateSize() })
 
 const wochenKunden = computed((): Kunde[] => {
   const seen = new Set<string>()
@@ -115,6 +118,7 @@ const tagDatum = computed(() => planung.tagDatum(planung.selectedTag))
         mobileView === 'karte' ? 'flex-1' : 'hidden'
       ]" style="height: 100%">
         <KarteView
+          ref="karteRef"
           :kunden="wochenKunden"
           :besuche="tagBesuche"
           :route-polyline="routePolyline"

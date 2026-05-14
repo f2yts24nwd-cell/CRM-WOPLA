@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useKundenStore } from '@/stores/kunden'
 import { usePlanungStore } from '@/stores/planung'
 import { useKiStore } from '@/stores/ki'
@@ -19,8 +19,11 @@ const kundenStore = useKundenStore()
 const planung = usePlanungStore()
 const ki = useKiStore()
 
-// Zentrum: Mittelpunkt München oder ausgefallener Kunde
-const zentrum = ref<[number, number]>([48.1374, 11.5754])
+const karteRef = ref<InstanceType<typeof KarteView>>()
+
+// Zentrum: Mittelpunkt Pforzheim oder ausgefallener Kunde
+const zentrum = ref<[number, number]>([48.892, 8.710])
+
 const radius = ref(25)
 const selectedAbc = ref<AbcStatus[]>(['A', 'B', 'C'])
 const minTage = ref(0)
@@ -33,6 +36,8 @@ const showKiPanel = ref(false)
 const kiEmpfehlungen = ref<KiEmpfehlungResult[]>([])
 type MobileView = 'filter' | 'karte'
 const mobileView = ref<MobileView>('filter')
+
+watch(mobileView, (v) => { if (v === 'karte') karteRef.value?.invalidateSize() })
 
 onMounted(() => {
   if (props.vorausgewaehlteBesuchId) {
@@ -202,6 +207,7 @@ const umkreis = computed(() => ({
         mobileView === 'karte' ? 'flex-1' : 'hidden'
       ]" style="height: 100%">
         <KarteView
+          ref="karteRef"
           :kunden="gefilterteKunden"
           :center="zentrum"
           :zoom="10"
