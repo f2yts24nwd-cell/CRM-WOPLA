@@ -10,7 +10,7 @@ export const mockKunden: Kunde[] = [
     lat: 48.8822, lng: 8.7073,
     branche: 'Schmuckindustrie',
     abcStatus: 'A',
-    letzterBesuch: d('2026-03-08'),
+    letzterBesuch: d('2026-05-11'),
     umsatzPotenzial: 185000
   },
   {
@@ -21,7 +21,7 @@ export const mockKunden: Kunde[] = [
     lat: 48.8805, lng: 8.7089,
     branche: 'Metallverarbeitung',
     abcStatus: 'A',
-    letzterBesuch: d('2026-04-05'),
+    letzterBesuch: d('2026-05-12'),
     umsatzPotenzial: 220000
   },
   {
@@ -32,7 +32,7 @@ export const mockKunden: Kunde[] = [
     lat: 48.8897, lng: 8.7145,
     branche: 'Uhrenindustrie',
     abcStatus: 'A',
-    letzterBesuch: d('2026-03-28'),
+    letzterBesuch: d('2026-05-11'),
     umsatzPotenzial: 275000
   },
   {
@@ -43,7 +43,7 @@ export const mockKunden: Kunde[] = [
     lat: 48.9546, lng: 8.7839,
     branche: 'Kunststoffverarbeitung',
     abcStatus: 'A',
-    letzterBesuch: d('2026-04-18'),
+    letzterBesuch: d('2026-05-13'),
     umsatzPotenzial: 165000
   },
   {
@@ -54,7 +54,7 @@ export const mockKunden: Kunde[] = [
     lat: 49.0072, lng: 8.7467,
     branche: 'IT & Software',
     abcStatus: 'A',
-    letzterBesuch: d('2026-04-22'),
+    letzterBesuch: d('2026-05-13'),
     umsatzPotenzial: 145000
   },
   {
@@ -65,7 +65,7 @@ export const mockKunden: Kunde[] = [
     lat: 48.9031, lng: 8.6645,
     branche: 'Galvanische Beschichtung',
     abcStatus: 'A',
-    letzterBesuch: d('2026-02-12'),
+    letzterBesuch: d('2026-05-11'),
     umsatzPotenzial: 198000
   },
   {
@@ -87,7 +87,7 @@ export const mockKunden: Kunde[] = [
     lat: 48.9265, lng: 8.6912,
     branche: 'Automobilzulieferer',
     abcStatus: 'B',
-    letzterBesuch: d('2026-03-22'),
+    letzterBesuch: d('2026-03-22'),  // KW20 ausgefallen
     umsatzPotenzial: 89000
   },
   {
@@ -98,7 +98,7 @@ export const mockKunden: Kunde[] = [
     lat: 48.9521, lng: 8.8045,
     branche: 'Druckerei & Medien',
     abcStatus: 'B',
-    letzterBesuch: d('2026-03-01'),
+    letzterBesuch: d('2026-05-12'),
     umsatzPotenzial: 72000
   },
   {
@@ -109,7 +109,7 @@ export const mockKunden: Kunde[] = [
     lat: 48.9445, lng: 8.6834,
     branche: 'Elektrotechnik',
     abcStatus: 'B',
-    letzterBesuch: d('2026-02-19'),
+    letzterBesuch: d('2026-05-14'),
     umsatzPotenzial: 105000
   },
   {
@@ -120,7 +120,7 @@ export const mockKunden: Kunde[] = [
     lat: 48.8934, lng: 8.9145,
     branche: 'Maschinenbau',
     abcStatus: 'B',
-    letzterBesuch: d('2026-01-10'),
+    letzterBesuch: d('2026-05-14'),
     umsatzPotenzial: 134000
   },
   {
@@ -131,7 +131,7 @@ export const mockKunden: Kunde[] = [
     lat: 48.7612, lng: 8.5567,
     branche: 'Tourismus & Hospitality',
     abcStatus: 'B',
-    letzterBesuch: d('2026-01-30'),
+    letzterBesuch: d('2026-05-14'),
     umsatzPotenzial: 58000
   },
   {
@@ -142,7 +142,7 @@ export const mockKunden: Kunde[] = [
     lat: 49.0134, lng: 8.6789,
     branche: 'Kunststoffverarbeitung',
     abcStatus: 'C',
-    letzterBesuch: d('2025-12-15'),
+    letzterBesuch: d('2026-05-15'),
     umsatzPotenzial: 42000
   },
   {
@@ -153,7 +153,7 @@ export const mockKunden: Kunde[] = [
     lat: 49.0512, lng: 8.8234,
     branche: 'IT & Software',
     abcStatus: 'C',
-    letzterBesuch: d('2026-02-08'),
+    letzterBesuch: d('2026-05-15'),
     umsatzPotenzial: 35000
   },
   {
@@ -164,7 +164,7 @@ export const mockKunden: Kunde[] = [
     lat: 48.9234, lng: 8.9102,
     branche: 'Logistik & Transport',
     abcStatus: 'C',
-    letzterBesuch: d('2026-01-05'),
+    letzterBesuch: d('2026-05-15'),
     umsatzPotenzial: 48000
   }
 ]
