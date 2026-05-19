@@ -9,7 +9,8 @@ const tage = computed(() =>
   planung.WOCHENTAGE.map((tag, i) => ({
     tag,
     datum: addDays(planung.wocheStart, i),
-    anzahl: planung.besucheForTag(tag).length
+    anzahl: planung.besucheForTag(tag).length,
+    aufgaben: planung.folgeaktionenForTag(tag).length
   }))
 )
 
@@ -38,7 +39,7 @@ const kw = computed(() => getKW(planung.wocheStart))
     <!-- Fiori Underline-Tabs für Tagauswahl -->
     <div class="flex">
       <button
-        v-for="{ tag, datum, anzahl } in tage"
+        v-for="{ tag, datum, anzahl, aufgaben } in tage"
         :key="tag"
         @click="planung.selectedTag = tag"
         :class="[
@@ -52,13 +53,22 @@ const kw = computed(() => getKW(planung.wocheStart))
         <span :class="planung.selectedTag === tag ? 'text-brand/70' : 'text-text2'">
           {{ formatShortDate(datum) }}
         </span>
-        <span v-if="anzahl > 0"
-          :class="[
-            'mt-0.5 w-4 h-4 rounded-full text-xs flex items-center justify-center font-bold',
-            planung.selectedTag === tag ? 'bg-brand text-white' : 'bg-brand/10 text-brand'
-          ]">
-          {{ anzahl }}
-        </span>
+        <div class="flex items-center gap-0.5 mt-0.5 h-4">
+          <span v-if="anzahl > 0"
+            :class="[
+              'w-4 h-4 rounded-full text-xs flex items-center justify-center font-bold',
+              planung.selectedTag === tag ? 'bg-brand text-white' : 'bg-brand/10 text-brand'
+            ]">
+            {{ anzahl }}
+          </span>
+          <span v-if="aufgaben > 0"
+            :class="[
+              'w-4 h-4 rounded-full text-xs flex items-center justify-center font-bold',
+              planung.selectedTag === tag ? 'bg-critical text-white' : 'bg-critical/10 text-critical'
+            ]">
+            {{ aufgaben }}
+          </span>
+        </div>
       </button>
     </div>
   </div>

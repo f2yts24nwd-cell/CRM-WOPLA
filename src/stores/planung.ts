@@ -97,9 +97,21 @@ export const usePlanungStore = defineStore('planung', () => {
     return berichte.value.find((b) => b.besuchId === besuchId)
   }
 
+  function folgeaktionenForTag(tag: Wochentag): Folgeaktion[] {
+    const datum = tagDatum(tag)
+    return folgeaktionen.value.filter((f) => !f.erledigt && isSameDay(f.faelligAm, datum))
+  }
+
   function folgeaktionErledigen(id: string) {
     const f = folgeaktionen.value.find((f) => f.id === id)
     if (f) f.erledigt = true
+  }
+
+  function folgeaktionAlsBesuchEintragen(id: string) {
+    const f = folgeaktionen.value.find((f) => f.id === id)
+    if (!f) return
+    besuchHinzufuegen(f.kundeId, f.faelligAm, '09:00', '10:00')
+    f.erledigt = true
   }
 
   function openKundenDetail(kundeId: string) {
@@ -133,7 +145,9 @@ export const usePlanungStore = defineStore('planung', () => {
     routeNeuAnordnen,
     openKundenDetail,
     closeKundenDetail,
+    folgeaktionenForTag,
     folgeaktionErledigen,
+    folgeaktionAlsBesuchEintragen,
     WOCHENTAGE
   }
 })
